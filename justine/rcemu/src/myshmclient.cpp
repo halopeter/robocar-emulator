@@ -70,6 +70,13 @@ std::vector<justine::sampleclient::MyShmClient::Gangster> justine::sampleclient:
     {
       nn += n;
       gangsters.push_back ( Gangster {idd, f, t, s} );
+
+      Gangster gangster = gangsters.back();         //Valtoztatas
+      gangsters.pop_back();
+      if(dst (cop, gangster.to) < dst (cop, gangster.from) ) {
+        gangsters.push_back (gangster);
+      }
+      std::cout << gangsters.size() << " size of gangsters vec " << std::endl;
     }
 
   std::sort ( gangsters.begin(), gangsters.end(), [this, cop] ( Gangster x, Gangster y )
@@ -352,7 +359,7 @@ void justine::sampleclient::MyShmClient::start10 ( boost::asio::io_service& io_s
           if ( gngstrs.size() > 0 )
             g = gngstrs[0].to;
           else
-            g = 0;
+            g = t;
 
           if ( g > 0 )
             {
