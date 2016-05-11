@@ -70,13 +70,6 @@ std::vector<justine::sampleclient::MyShmClient::Gangster> justine::sampleclient:
     {
       nn += n;
       gangsters.push_back ( Gangster {idd, f, t, s} );
-
-      Gangster gangster = gangsters.back();         //Valtoztatas
-      gangsters.pop_back();
-      if(dst (cop, gangster.to) < dst (cop, gangster.from) ) {
-        gangsters.push_back (gangster);
-      }
-      std::cout << gangsters.size() << " size of gangsters vec " << std::endl;
     }
 
   std::sort ( gangsters.begin(), gangsters.end(), [this, cop] ( Gangster x, Gangster y )
@@ -343,6 +336,9 @@ void justine::sampleclient::MyShmClient::start10 ( boost::asio::io_service& io_s
   unsigned int f {0u};
   unsigned int t {0u};
   unsigned int s {0u};
+  unsigned int elozocelpont;     //+
+  int i;
+
 
   std::vector<Gangster> gngstrs;
 
@@ -350,16 +346,27 @@ void justine::sampleclient::MyShmClient::start10 ( boost::asio::io_service& io_s
     {
       std::this_thread::sleep_for ( std::chrono::milliseconds ( 200 ) );
 
-      for ( auto cop:cops )
+      for ( std::vector<Cop>::iterator m=cops.begin(); m != cops.end(); m++ )
         {
-          car ( socket, cop, &f, &t, &s );
+          i=std::distance( cops.begin(), m );
+          car ( socket, cops[i] , &f, &t, &s );
+          if(i%2==0) {
 
-          gngstrs = gangsters ( socket, cop, t );
 
-          if ( gngstrs.size() > 0 )
+          gngstrs = gangsters ( socket, cops[i] , t );
+
+          if ( gngstrs.size() > 0 ) {
             g = gngstrs[0].to;
-          else
-            g = t;
+            elozocelpont=g;
+          }
+
+          else {
+            g = 0;
+            elozocelpont=g;
+          }
+          }
+
+          else g=elozocelpont;
 
           if ( g > 0 )
             {
@@ -372,7 +379,7 @@ void justine::sampleclient::MyShmClient::start10 ( boost::asio::io_service& io_s
                   std::copy ( path.begin(), path.end(),
                               std::ostream_iterator<osmium::unsigned_object_id_type> ( std::cout, " -> " ) );
 
-                  route ( socket, cop, path );
+                  route ( socket, cops[i], path );
                 }
             }
         }
